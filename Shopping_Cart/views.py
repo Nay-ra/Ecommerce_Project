@@ -1,75 +1,64 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.decorators.http import require_POST
 from django.contrib import messages
 from Product_Management.models import Product
-from .models import CartItem
-from .utils import get_or_create_user_cart
+
+def get_cart(session):
+    return session.get('cart', {})
 
 def cart_detail(request):
-    """Displays items currently in the cart."""
-    cart = get_or_create_user_cart(request)
-    return render(request, 'Shopping_Cart/cart_detail.html', {'cart': cart})
+    cart = get_cart(request.session)
+    cart_items = []
+    total_price = 0
 
+    for product_id, quantity in cart.items():
+        product = get_object_or_404(Product, id=int(product_id))
+        item_total = product.price * quantity
+        total_price += item_total
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'total_price': item_total,
+        })
 
-@require_POST
+    return render(request, 'Shopping_Cart/cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    })
+
 def add_to_cart(request, product_id):
-    """Adds a product to the cart with stock validation."""
-    cart = get_or_create_user_cart(request)
-    product = get_object_or_404(Product, id=product_id, is_available=True)
+    product = get_object_or_404(Product, id=product_id)
+    cart = request.session.get('cart', {})
     
-    quantity = int(request.POST.get('quantity', 1))
-
-    cart_item, created = CartItem.objects.get_or_create(
-        cart=cart,
-        product=product,
-        defaults={'quantity': quantity}
-    )
-
-    if not created:
-        requested_total = cart_item.quantity + quantity
-        if requested_total > product.stock:
-            messages.warning(request, f"Only {product.stock} units of '{product.name}' available in stock.")
-            cart_item.quantity = product.stock
-        else:
-            cart_item.quantity = requested_total
-        cart_item.save()
-    else:
-        if quantity > product.stock:
-            messages.warning(request, f"Requested quantity exceeds stock. Added {product.stock} items instead.")
-            cart_item.quantity = product.stock
-            cart_item.save()
-
-    messages.success(request, f"Added {product.name} to your cart.")
+    str_id = str(product_id)
+    cart[str_id] = cart.get(str_id, 0) + 1
+    
+    request.session['cart'] = cart
+    request.session.modified = True  # Ensures session saves
+    messages.success(request, f'Added {product.name} to cart.')
     return redirect('Shopping_Cart:cart_detail')
 
-
-@require_POST
 def update_cart_quantity(request, item_id):
-    """Updates item quantity in the cart."""
-    cart = get_or_create_user_cart(request)
-    cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
-    quantity = int(request.POST.get('quantity', 1))
-
-    if quantity <= 0:
-        cart_item.delete()
-        messages.info(request, "Item removed from cart.")
-    elif quantity > cart_item.product.stock:
-        cart_item.quantity = cart_item.product.stock
-        cart_item.save()
-        messages.warning(request, f"Max available stock is {cart_item.product.stock}.")
-    else:
-        cart_item.quantity = quantity
-        cart_item.save()
-        messages.success(request, "Cart updated.")
-
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        quantity = int(request.POST.get('quantity', 1))
+        str_id = str(item_id)
+        
+        if quantity > 0:
+            cart[str_id] = quantity
+        else:
+            cart.pop(str_id, None)
+            
+        request.session['cart'] = cart
+        request.session.modified = True  # Ensures session saves
+        messages.info(request, 'Cart updated.')
     return redirect('Shopping_Cart:cart_detail')
 
-
-@require_POST
 def remove_from_cart(request, item_id):
-    """Removes an item completely from the cart."""
-    cart = get_or_create_user_cart(request)
-    cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
-    cart_item.delete()
-    messages.info(request, "Item removed from cart.")
+    cart = request.session.get('cart', {})
+    str_id = str(item_id)
+    if str_id in cart:
+        del cart[str_id]
+        request.session['cart'] = cart
+        request.session.modified = True  # Ensures session saves
+        messages.info(request, 'Item removed from cart.')
     return redirect('Shopping_Cart:cart_detail')
