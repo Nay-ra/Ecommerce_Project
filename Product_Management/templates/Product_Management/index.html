@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>E-Commerce Storefront</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
+        .navbar { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .navbar a { color: white; margin-left: 15px; text-decoration: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .card { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; }
+        .price { color: #28a745; font-weight: bold; font-size: 1.2em; }
+        .btn { display: inline-block; background: #007bff; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h2>E-Commerce Store</h2>
+    <div>
+        <a href="{% url 'product_list' %}">Home</a>
+        {% if user.is_authenticated %}
+            <span>Welcome, {{ user.username }}!</span>
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </div>
+</div>
+
+<h1>Our Products</h1>
+
+<div class="grid">
+    {% for product in products %}
+        <div class="card">
+            <h3>{{ product.title }}</h3>
+            <p>{{ product.description|truncatewords:15 }}</p>
+            <div class="price">${{ product.price }}</div>
+            <a href="#" class="btn">Add to Cart</a>
+        </div>
+    {% empty %}
+        <p>No products available right now. Add some in the Django Admin!</p>
+    {% endfor %}
+</div>
+
+</body>
+</html>

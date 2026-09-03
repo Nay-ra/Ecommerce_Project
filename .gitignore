@@ -1,0 +1,18 @@
+# Environment & Secret Keys (MUST NOT be committed to GitHub)
+.env
+.env.*
+
+# Python Cache & Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django Local Database & Logs
+db.sqlite3
+*.log
+
+# Virtual Environments
+venv/
+env/
+ENV/
