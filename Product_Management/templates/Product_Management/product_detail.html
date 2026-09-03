@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ product.name }}</h2>
+    <p style="color: #666;">Category: {{ product.category.name }}</p>
+    <p>{{ product.description }}</p>
+    <div class="price">${{ product.price }}</div>
+
+    <form method="POST" action="{% url 'Shopping_Cart:cart_add' product.id %}">
+        {% csrf_token %}
+        <label>QTY:</label>
+        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" style="width: 50px; padding: 5px;">
+        <button type="submit" class="btn">Add to Cart</button>
+    </form>
+</div>
+
+{% if similar_recs %}
+<div class="ai-card" style="margin-top: 20px;">
+    <span class="badge">Groq AI Pairings</span>
+    <p style="margin: 8px 0;">{{ ai_explanation }}</p>
+    <div style="display: flex; gap: 10px;">
+        {% for item in similar_recs %}
+            <div style="background: white; padding: 10px; border-radius: 4px; flex: 1; border: 1px solid #ddd;">
+                <h4>{{ item.name }}</h4>
+                <div class="price">${{ item.price }}</div>
+                <a href="{% url 'Product_Management:product_detail' item.slug %}" class="btn" style="padding: 4px 8px; font-size: 0.8rem;">View</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

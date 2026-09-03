@@ -16,3 +16,4 @@ class UserAuthenticationConfig(AppConfig):
                 request.session.pop('cart_id', None)
 
         user_logged_in.connect(on_user_logged_in)
+        
