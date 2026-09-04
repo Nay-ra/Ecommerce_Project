@@ -103,4 +103,13 @@ MAILERS = {
 }
 
 AUTH_USER_MODEL = 'User_Authentication.User'
-LOGIN_URL = 'login'
+LOGIN_URL = 'User_Authentication:login'
+LOGIN_REDIRECT_URL = 'Product_Management:product_list'
+LOGOUT_REDIRECT_URL = 'User_Authentication:login'
+
+import os
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History | AURA Store{% endblock %}
+
+{% block content %}
+<section class="py-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <p class="text-uppercase text-muted small fw-bold mb-1">Your account</p>
+            <h1 class="fw-bold mb-0">Order History</h1>
+        </div>
+        <a href="{% url 'Product_Management:product_list' %}" class="btn btn-outline-primary">Continue Shopping</a>
+    </div>
+
+    {% if orders %}
+        <div class="row g-4">
+            {% for order in orders %}
+                <div class="col-12">
+                    <article class="card p-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                            <div>
+                                <h2 class="h5 fw-bold mb-1">Order #{{ order.id }}</h2>
+                                <p class="text-muted mb-0">Placed {{ order.created_at|date:"M d, Y" }}</p>
+                            </div>
+                            <span class="badge rounded-pill {% if order.status == 'Completed' %}text-bg-success{% elif order.status == 'Canceled' %}text-bg-danger{% elif order.status == 'Shipped' %}text-bg-info{% else %}text-bg-warning{% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                        <hr>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <span class="text-muted small">Total</span>
+                                <div class="h4 fw-bold mb-0" style="color: #56b299;">${{ order.total_amount }}</div>
+                            </div>
+                            <a href="{% url 'Order_Management:order_detail' order.id %}" class="btn btn-primary">View Order</a>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card text-center p-5">
+            <i class="bi bi-receipt fs-1" style="color: #56b299;"></i>
+            <h2 class="h4 fw-bold mt-3">No orders yet</h2>
+            <p class="text-muted">Your completed purchases will appear here.</p>
+            <a href="{% url 'Product_Management:product_list' %}" class="btn btn-primary align-self-center">Browse Products</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

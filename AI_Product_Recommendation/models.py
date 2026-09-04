@@ -1,7 +1,7 @@
 # Create your models here.
 from django.db import models
 from django.conf import settings
-from Product_Management.models import Product
+from Product_Management.models import KidsProduct as Product
 
 class UserInteraction(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

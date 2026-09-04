@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Category, Product
+from .models import FunCategory, KidsProduct
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -13,3 +14,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = ['price', 'stock', 'is_available']
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
+
+
+admin.site.register(FunCategory)
+admin.site.register(KidsProduct)

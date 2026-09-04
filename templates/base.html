@@ -4,59 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AURA E-Commerce Store{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/minty/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: #f4f6f8; color: #333; line-height: 1.6; }
-        nav { background-color: #1a1a1a; color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        nav a { color: #fff; text-decoration: none; margin-left: 20px; font-weight: 500; }
-        nav a:hover { text-decoration: underline; }
-        .logo { font-size: 1.4rem; font-weight: bold; color: #007bff !important; }
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-        .messages { list-style: none; margin-bottom: 20px; }
-        .messages li { padding: 12px 15px; border-radius: 4px; margin-bottom: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        footer { text-align: center; padding: 20px; color: #777; font-size: 0.9rem; margin-top: 40px; }
+        :root { --aura-mint: #78c2ad; --aura-pink: #f3969a; --aura-ink: #183b37; --aura-cream: #fffaf5; }
+        * { font-family: 'Poppins', sans-serif; }
+        body { display: flex; flex-direction: column; min-height: 100vh; background: linear-gradient(135deg, #fffaf5 0%, #f1fbf7 100%); color: var(--aura-ink); }
+        main.container { flex: 1; }
+        nav.navbar { background: linear-gradient(135deg, #78c2ad 0%, #56b299 100%) !important; box-shadow: 0 3px 0 rgba(24, 59, 55, 0.12); }
+        .logo { font-family: 'Poppins', sans-serif; font-weight: 700; letter-spacing: 0.5px; }
+        .navbar .nav-link, .navbar .navbar-text { color: #fff !important; font-weight: 600; }
+        .navbar .nav-link:hover { color: #183b37 !important; }
+        .navbar .btn { border-radius: 20px; font-weight: 700; }
+        .navbar .btn-primary { background-color: var(--aura-pink); border-color: var(--aura-pink); }
+        .navbar .btn-danger { background-color: #183b37; border-color: #183b37; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(24, 59, 55, 0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(24, 59, 55, 0.14); }
+        .btn { border-radius: 20px; font-weight: 600; }
+        .alert { border-radius: 0; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div>
-            <a href="{% url 'Product_Management:product_list' %}" class="logo">AURA Store</a>
-            <a href="{% url 'Product_Management:product_list' %}">Products</a>
-            <a href="{% url 'AI_Product_Recommendation:recommendations' %}">✨ AI Assistant</a>
-        </div>
-        <div>
-            <a href="{% url 'Shopping_Cart:cart_detail' %}">🛒 Cart</a>
-            
-            {% if user.is_authenticated %}
-                <span style="margin-left: 20px; color: #bbb;">Welcome, {{ user.username }}!</span>
-                <form action="{% url 'User_Authentication:logout' %}" method="post" style="display: inline; margin-left: 10px;">
-                    {% csrf_token %}
-                    <button type="submit" style="background: none; border: none; color: #ff4d4d; cursor: pointer; text-decoration: underline; font-size: 1rem;">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'User_Authentication:login' %}">Login</a>
-                <a href="{% url 'User_Authentication:register' %}">Register</a>
-            {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <div class="container-fluid">
+            <a href="{% url 'Product_Management:product_list' %}" class="navbar-brand logo">AURA Store</a>
+            <div class="collapse navbar-collapse show">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Product_Management:product_list' %}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'AI_Product_Recommendation:recommendations' %}">✨ AI Assistant</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Shopping_Cart:cart_detail' %}">
+                            <i class="bi bi-cart-fill"></i> Cart
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Order_Management:order_history' %}">
+                                <i class="bi bi-receipt"></i> Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <span class="navbar-text text-light me-2">Welcome, {{ user.username }}!</span>
+                        </li>
+                        <li class="nav-item">
+                            <form action="{% url 'User_Authentication:logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="{% url 'User_Authentication:login' %}" class="btn btn-outline-light btn-sm me-2">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'User_Authentication:register' %}" class="btn btn-primary btn-sm">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
+    <main class="container my-4">
         {% if messages %}
-            <ul class="messages">
+            <div class="mb-3">
                 {% for message in messages %}
-                    <li>{{ message }}</li>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% endif %}
 
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 
-    <footer>
+    <footer class="text-center py-3 text-muted small">
         &copy; 2026 AURA Store. All rights reserved.
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
